@@ -34,18 +34,31 @@ def IMN_read_station_webpage(station):
             if len(table_data):
                 if len(table_data[0]):
                     if table_data[0][0] == "Fecha":
+                        table_data[0] = [d.replace("PRES_mb", "P Atm") for d in table_data[0]]
+                        table_data[0] = [d.replace("Nivel_Rio_Zapote", "Nivel") for d in table_data[0]]    
                         data_df = pd.DataFrame(table_data[1:], columns=table_data[0])
-                        data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format="%d/%m/%Y %I:%M %p")
+                        try:
+                            data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format="%d/%m/%Y %I:%M %p")
+                        except ValueError:
+                            try:
+                                data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format="%d/%m/%Y %H:%M:%S")
+                            except ValueError:
+                                print("Error parsing dates")
+                                return None
                         cols = data_df.columns
                         data_df[cols[1:]] = data_df[cols[1:]].apply(pd.to_numeric, errors='coerce')
                         return data_df
 
     return None
 
+stations = db.read_stations() ## All stations to scrap data
+if len(stations) > 0:
+    for i, station in stations.iterrows():
+        if True: #i == 24:
+            station_data = IMN_read_station_webpage(station)    ## station data
+            station_vars = list(station_data.columns)       ## list of all variables in this station
+            db.write_variables(station_vars)                ## check all variables are in database (stored procedure)
+            db.write_data_values(station, station_data)
 
-stations = db.read_stations()
 
-#print(stations["Name"])
-
-for _, station in stations.iterrows():
-    print(IMN_read_station_webpage(station))
+# print(db.read_variables())
