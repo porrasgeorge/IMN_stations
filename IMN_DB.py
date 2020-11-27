@@ -1,6 +1,14 @@
 import pyodbc
 import pandas as pd
 import numpy as np
+from os import makedirs, path
+from datetime import datetime
+import logging
+
+log_filename = f'logs\\datalog_{datetime.now().strftime("%Y_%m")}.log'
+makedirs(path.dirname(log_filename), exist_ok=True)
+logging.basicConfig(level=logging.INFO, filename=log_filename,
+                    format='%(asctime)s Ln: %(lineno)d - %(message)s')
 
 stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tablas/canalete.html", "Lat":10.8408, "Long": -85.0398, "Description":"Rio Zapote Canalete de Upala, Alajuela"},
     {"Name":"ADIFORT", "Link":"https://www.imn.ac.cr/especial/tablas/fortuna.html", "Lat":10.4675, "Long": -84.64694, "Description":"ADIFORT en la Fortuna de San Carlos"},
@@ -33,56 +41,67 @@ def lightnings_db_connection():
     database = 'LightningStrikes'
     password = 'lightnings'
     username = 'lightnings'
-    cnxn = pyodbc.connect(driver='{SQL Server}', host=server, database=database,
+    try:
+        cnxn = pyodbc.connect(driver='{SQL Server}', host=server, database=database,
                           user=username, password=password, autocommit=True)
+    except:
+        logging.info("Error de conexion con Base de Datos")
+        return None
     return cnxn
 
 def write_stations(stations):
     cnxn = lightnings_db_connection()
-    cursor = cnxn.cursor()
-    sql = "{CALL InsertStation (?, ?, ?, ?, ?)}"
-    for station in stations:
-        values = (station["Name"], station["Link"], station["Description"], station["Lat"], station["Long"])
-        try:
-            cursor.execute(sql, values)
-        except pyodbc.Error as err:
-            print(err)
-    cnxn.close()
-
-def read_stations():
-    cnxn = lightnings_db_connection()
-    sql = f"""select * from IMN_WeatherStations order by id"""
-    try:
-        stations_df = pd.read_sql_query(sql, cnxn)
-    except pyodbc.Error as err:
-        print('Error !!!!! %s' % err)
-        return None
-    cnxn.close()
-    return stations_df
-
-def write_variables(variables):
-    cnxn = lightnings_db_connection()
-    cursor = cnxn.cursor()
-    sql = "{CALL InsertVariable (?)}"
-    for variable in variables:
-        if variable not in ["Fecha"]:
-            values = (variable)
+    if cnxn is not None:
+        cursor = cnxn.cursor()
+        sql = "{CALL InsertStation (?, ?, ?, ?, ?)}"
+        for station in stations:
+            values = (station["Name"], station["Link"], station["Description"], station["Lat"], station["Long"])
             try:
                 cursor.execute(sql, values)
             except pyodbc.Error as err:
-                print(err)
+                logging.info(err)
     cnxn.close()
+
+def read_stations(): ## Only the active Ones
+    cnxn = lightnings_db_connection()
+    sql = f"""select * from IMN_WeatherStations where [Enabled] = 1 order by id"""
+    if cnxn is not None:
+        try:
+            stations_df = pd.read_sql_query(sql, cnxn)
+        except pyodbc.Error as err:
+            logging.info('Error !!!!! %s' % err)
+            return None
+        cnxn.close()
+        return stations_df
+    return None
+
+def write_variables(variables):
+    cnxn = lightnings_db_connection()
+    if cnxn is not None:
+        cursor = cnxn.cursor()
+        sql = "{CALL InsertVariable (?)}"
+        for variable in variables:
+            if variable not in ["Fecha"]:
+                values = (variable)
+                try:
+                    cursor.execute(sql, values)
+                except pyodbc.Error as err:
+                    logging.info(err)
+        cnxn.close()
 
 def read_variables():
     cnxn = lightnings_db_connection()
     sql = f"""select * from IMN_WeatherVars order by id"""
-    try:
-        vars_df = pd.read_sql_query(sql, cnxn)
-    except pyodbc.Error as err:
-        print('Error !!!!! %s' % err)
-        return None
-    cnxn.close()
-    return vars_df
+    if cnxn is not None:
+        try:
+            vars_df = pd.read_sql_query(sql, cnxn)
+        except pyodbc.Error as err:
+            logging.info('Error !!!!! %s' % err)
+            return None
+        cnxn.close()
+        return vars_df
+    return None
+
 
 def write_data_values(station, station_data):
     station_name = station["Name"]
@@ -90,18 +109,20 @@ def write_data_values(station, station_data):
     cols = cols[1:]
     
     cnxn = lightnings_db_connection()
-    cursor = cnxn.cursor()
-    sql = "{CALL InsertDataMeasure (?, ?, ?, ?)}"
-    for _, row in station_data.iterrows():
-        for i in cols:
-            if not np.isnan(row[i]) :
-                values = (station_name, i, row["Fecha"], row[i])
-                try:
-                    cursor.execute(sql, values)
-                except pyodbc.Error as err:
-                    print(err)
-    cnxn.close()
-
+    if cnxn is not None:
+        cursor = cnxn.cursor()
+        sql = "{CALL InsertDataMeasure (?, ?, ?, ?)}"
+        for _, row in station_data.iterrows():
+            for i in cols:
+                if not np.isnan(row[i]) :
+                    values = (station_name, i, row["Fecha"], row[i])
+                    try:
+                        cursor.execute(sql, values)
+                    except pyodbc.Error as err:
+                        logging.info(err)
+        cnxn.close()
+    
 
 if __name__ == "__main__":
-    write_stations(stations)
+#     write_stations(stations)
+    print(read_stations())
