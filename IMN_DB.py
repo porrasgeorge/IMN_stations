@@ -69,7 +69,7 @@ def read_stations(): ## Only the active Ones
         try:
             stations_df = pd.read_sql_query(sql, cnxn)
         except pyodbc.Error as err:
-            logging.info('Error !!!!! %s' % err)
+            logging.info('Error leyendo las Estaciones %s' % err)
             return None
         cnxn.close()
         return stations_df
@@ -96,7 +96,7 @@ def read_variables():
         try:
             vars_df = pd.read_sql_query(sql, cnxn)
         except pyodbc.Error as err:
-            logging.info('Error !!!!! %s' % err)
+            logging.info('Error Leyendo las Variables %s' % err)
             return None
         cnxn.close()
         return vars_df

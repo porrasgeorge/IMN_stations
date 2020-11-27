@@ -3,14 +3,15 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import IMN_DB as db
 import logging
+import time
 
 def IMN_read_station_webpage(station):
-    print("Station: ", station["Name"])
+    #print("Station: ", station["Name"])
     response = None
     try:
         response = requests.get(station["Link"], timeout=10)
     except (requests.ConnectionError, requests.Timeout):
-        logging.info("Connection Error or timeout")
+        logging.info(f'{station["Name"]}: Connection Error or timeout')
     
     if response:
         if response.status_code == 200:
@@ -45,15 +46,17 @@ def IMN_read_station_webpage(station):
                                 try:
                                     data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format="%d/%m/%Y %H:%M:%S")
                                 except ValueError:
-                                    logging.info("Error parsing dates")
+                                    logging.info(f'{station["Name"]}: Error parsing dates')
                                     return None
                             cols = data_df.columns
                             data_df[cols[1:]] = data_df[cols[1:]].apply(pd.to_numeric, errors='coerce')
                             return data_df
         else:
-            logging.info("Error loading page")
+            logging.info(f'{station["Name"]}: Error cargando la pagina web')
+            time.sleep(10)  ## wait to check for the next page
             return None
-    logging.info("Error No Response")
+    logging.info(f'{station["Name"]}: Error, No hay respuesta de la pagina web')
+    time.sleep(10)      ## wait to check for the next page
     return None
 
 stations = db.read_stations() ## All stations to scrap data
