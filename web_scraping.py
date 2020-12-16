@@ -9,6 +9,7 @@ def IMN_read_station_webpage(station):
     #print("Station: ", station["Name"])
     response = None
     try:
+        print(station)
         response = requests.get(station["Link"], timeout=10)
     except (requests.ConnectionError, requests.Timeout):
         logging.info(f'{station["Name"]}: Connection Error or timeout')
@@ -59,13 +60,5 @@ def IMN_read_station_webpage(station):
     time.sleep(10)      ## wait to check for the next page
     return None
 
-stations = db.read_stations() ## All stations to scrap data
-if stations is not None:
-    for i, station in stations.iterrows():
-        ##if True: #i == 24:
-        station_data = IMN_read_station_webpage(station)    ## station data
-        if station_data is not None:
-            station_vars = list(station_data.columns)       ## list of all variables in this station
-            db.write_variables(station_vars)                ## check all variables are in database (stored procedure)
-            db.write_data_values(station, station_data)
+
 
