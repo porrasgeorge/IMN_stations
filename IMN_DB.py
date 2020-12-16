@@ -63,8 +63,31 @@ loc_stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tab
     {"Name":"Caramba Farms", "Link":"https://www.imn.ac.cr/especial/tablas/roxana.html", "Lat":10.2686, "Long":-83.7464, "Description":"Caramba Farms, Roxana, Pococí"},
     {"Name":"CATIE", "Link":"https://www.imn.ac.cr/especial/tablas/catie.html", "Lat":9.8914, "Long":-83.6531, "Description":"CATIE, Turrialba, Cartago"},
     {"Name":"Cerro Buenavista", "Link":"https://www.imn.ac.cr/especial/tablas/cmuerte.html", "Lat":9.5600, "Long":-83.7536, "Description":"Cerro Buena Vista de Pérez Zeledón"},
-    {"Name":"Cerro Burio", "Link":"https://www.imn.ac.cr/especial/tablas/burio.html", "Lat":9.8403, "Long":-84.1125, "Description":"El Burío, Aserrí, San José"}]
-
+    {"Name":"Cerro Burio", "Link":"https://www.imn.ac.cr/especial/tablas/burio.html", "Lat":9.8403, "Long":-84.1125, "Description":"El Burío, Aserrí, San José"},
+    {"Name":"Cerro Chitaria", "Link":"https://www.imn.ac.cr/especial/tablas/chitaria.html", "Lat":9.8917, "Long":-84.1937, "Description":"Cerro Chitaria, Santa Ana, San José"},
+    {"Name":"Cerro Chirripo", "Link":"https://www.imn.ac.cr/especial/tablas/chirripo.html", "Lat":9.4594, "Long":-83.5081, "Description":"Cerro Chiripó, Pérez Zeledón, San José"},
+    {"Name":"Cerro Huacalito", "Link":"https://www.imn.ac.cr/especial/tablas/huacalito.html", "Lat":10.3930, "Long":-85.4128, "Description":"Huacalito de Filadelfia en Carrillo Guanacaste"},
+    {"Name":"Cerro Juco", "Link":"https://www.imn.ac.cr/especial/tablas/juco.html", "Lat":9.7754, "Long":-83.8647, "Description":"Cerro Juco de Orosi en Paraiso de Cartago"},
+    {"Name":"Chaguites", "Link":"https://www.imn.ac.cr/especial/tablas/chaguites.html", "Lat":10.0794, "Long":-84.1642, "Description":"Chagüites, Santa Bárbara, Heredia"},
+    {"Name":"CIGEFI", "Link":"https://www.imn.ac.cr/especial/tablas/cigefi.html", "Lat":9.9364, "Long":-84.0453, "Description":"CIGEFI en Montes de Oca, San José"},
+    {"Name":"Ciudad de los Ninos", "Link":"https://www.imn.ac.cr/especial/tablas/ciudadninos.html", "Lat":5.8342, "Long":-83.9211, "Description":"Ciudad de los Niños, Paraiso, Cartago"},
+    {"Name":"Ciudad Judicial", "Link":"https://www.imn.ac.cr/especial/tablas/ciudadjudicial.html", "Lat":10.0069, "Long":-84.1639, "Description":"Ciudad Judicial, San Joaquín, Heredia"},
+    {"Name":"Copalchi", "Link":"https://www.imn.ac.cr/especial/tablas/copalchi.html", "Lat":11.2000, "Long":-85.6186, "Description":"Copalchí, La Cruz, Guanacaste"},
+    {"Name":"Coto 49", "Link":"https://www.imn.ac.cr/especial/tablas/coto49.html", "Lat":8.6312, "Long":-82.9669, "Description":"Coto 49, Corredores, Puntarenas"},
+    {"Name":"Dulce Nombre", "Link":"https://www.imn.ac.cr/especial/tablas/puravida.html", "Lat":10.0958, "Long":-85.4783, "Description":"Dulce Nombre, Nicoya, Guanacaste"},
+    {"Name":"EARTH", "Link":"https://www.imn.ac.cr/especial/tablas/earth.html", "Lat":10.2097, "Long":-83.5942, "Description":"Earth - Guácimo Limón"},
+    {"Name":"El Corral Palo Verde", "Link":"https://www.imn.ac.cr/especial/tablas/paloverde.html", "Lat":10.3475, "Long":-85.3511, "Description":"Palo Verde en Bagaces, Guanacaste"},
+    {"Name":"El Rodeo", "Link":"https://www.imn.ac.cr/especial/tablas/tarrazu.html", "Lat":9.6762, "Long":-84.0184, "Description":"El Rodeo, Tarrazú, San José"},
+    {"Name":"Fabio Baudrit", "Link":"https://www.imn.ac.cr/especial/tablas/fabio.html", "Lat":10.0050, "Long":-84.2656, "Description":"Fabio Baudrit - UCR, La Garita, Alajuela"},
+    {"Name":"Finca Damas", "Link":"https://www.imn.ac.cr/especial/tablas/damas.html", "Lat":9.4953, "Long":-84.2147, "Description":"Finca Damas, Quepos, Puntarenas"},
+    {"Name":"Finca El Carmen", "Link":"https://www.imn.ac.cr/especial/tablas/elcarmen.html", "Lat":10.1994, "Long":-83.4814, "Description":"El Carmen, Siquirres, Limón"},
+    {"Name":"Finca El Patio", "Link":"https://www.imn.ac.cr/especial/tablas/jimenez.html", "Lat":8.6010, "Long":-83.4312, "Description":"Finca El Patio, Puerto Jiménez, Golfito, Puntarenas"},
+    {"Name":"Finca La Ceiba", "Link":"https://www.imn.ac.cr/especial/tablas/laceiba.html", "Lat":10.1114, "Long":-85.3176, "Description":"Finca la Ceiba, Nicoya, Guanacaste"},
+    {"Name":"Finca Los Macaya", "Link":"https://www.imn.ac.cr/especial/tablas/macaya.html", "Lat":9.9686, "Long":-83.9713, "Description":"Finca los Macayas, Goicoechea, San José"},
+    {"Name":"Fundacion Neotropica", "Link":"https://www.imn.ac.cr/especial/tablas/neotropica.html", "Lat":8.6997, "Long":-83.5142, "Description":"Fundación Neotrópica, Osa, Puntarenas"},
+    {"Name":"Guayabal Mastate", "Link":"https://www.imn.ac.cr/especial/tablas/gmastate.html", "Lat":9.9175, "Long":-84.5853, "Description":"Guayabal Mastate, Orotina, Alajuela"},
+    {"Name":"Hacienda Mojica", "Link":"https://www.imn.ac.cr/especial/tablas/mojica.html", "Lat":10.4528, "Long":-85.1653, "Description":"Hacienda Mojica, Bagaces, Guanacaste"},
+    {"Name":"Hacienda Taboga", "Link":"https://www.imn.ac.cr/especial/tablas/taboga.html", "Lat":10.3458, "Long":-85.1775, "Description":"Hacienda Taboga, Cañas, Guanacaste"}]
 
 # ,
 #     {"Name":"", "Link":"https://www.imn.ac.cr/especial/tablas/", "Lat":, "Long":, "Description":""}

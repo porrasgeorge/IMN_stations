@@ -6,9 +6,9 @@ from pathlib import Path
 
 base_path = f'\\\\192.168.30.30\\Planificacion\\Estaciones_IMN'
 Path(base_path).mkdir(parents=True, exist_ok=True)
-end_date = date.today()
+end_date = date.today()+ relativedelta(days=1)
 # initial_date = end_date - relativedelta(months=1)
-initial_date = end_date - relativedelta(days=1)
+initial_date = end_date - relativedelta(days=2)
 date_range_5min = pd.DataFrame({'DateTime': pd.date_range(start=initial_date+relativedelta(minutes=5), end=end_date, freq="5min")})
 date_range_1hr = pd.DataFrame({'DateTime': pd.date_range(start=initial_date+relativedelta(minutes=60), end=end_date, freq="60min")})
 
