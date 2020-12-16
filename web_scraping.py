@@ -41,6 +41,7 @@ def IMN_read_station_webpage(station):
                             table_data[0] = [d.replace("PRES_mb", "P Atm") for d in table_data[0]]
                             table_data[0] = [d.replace("Rad_PAR", "Rad PAR") for d in table_data[0]]
                             table_data[0] = [d.replace("P.Atm", "P Atm") for d in table_data[0]]
+                            table_data[0] = [d.replace("P. Atm", "P Atm") for d in table_data[0]]
                             table_data[0] = [d.replace("Nivel_Rio_Zapote", "Nivel") for d in table_data[0]]    
                             data_df = pd.DataFrame(table_data[1:], columns=table_data[0])
                             try:
