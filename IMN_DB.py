@@ -10,7 +10,7 @@ makedirs(path.dirname(log_filename), exist_ok=True)
 logging.basicConfig(level=logging.INFO, filename=log_filename,
                     format='%(asctime)s Ln: %(lineno)d - %(message)s')
 
-stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tablas/canalete.html", "Lat":10.8408, "Long": -85.0398, "Description":"Rio Zapote Canalete de Upala, Alajuela"},
+loc_stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tablas/canalete.html", "Lat":10.8408, "Long": -85.0398, "Description":"Rio Zapote Canalete de Upala, Alajuela"},
     {"Name":"ADIFORT", "Link":"https://www.imn.ac.cr/especial/tablas/fortuna.html", "Lat":10.4675, "Long": -84.64694, "Description":"ADIFORT en la Fortuna de San Carlos"},
     {"Name":"Upala", "Link":"https://www.imn.ac.cr/especial/tablas/upala.html", "Lat":10.88361, "Long": -85.0725, "Description":"Upala, Alajuela"},
     {"Name":"Brasilia", "Link":"https://www.imn.ac.cr/especial/tablas/brasilia.html", "Lat":10.98325, "Long": -85.34722, "Description":"Finca Brasilia del Oro, Upala, Alajuela"},
@@ -34,7 +34,9 @@ stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tablas/
     {"Name":"Cano Negro", "Link":"https://www.imn.ac.cr/especial/tablas/canonegro.html", "Lat":10.8918, "Long": -84.7877, "Description":"Refugio Caño Negro, Los Chiles - Alajuela"},
     {"Name":"San Jorge", "Link":"https://www.imn.ac.cr/especial/tablas/sanjorge.html", "Lat":10.7237, "Long": -84.6751, "Description":"Saint George (San Jorge), Los Chiles, Alajuela"},
     {"Name":"San Gerardo", "Link":"https://www.imn.ac.cr/especial/tablas/sangerardo.html", "Lat":10.4159, "Long": -84.1581, "Description":"San Gerardo, La Virgen de Sarapiquí, Heredia"},
-    {"Name":"Tenorio", "Link":"https://www.imn.ac.cr/especial/tablas/tenorio.html", "Lat":10.7156, "Long": -84.98691, "Description":"Parque Nacional Volcán Tenorio, Guatuso, Alajuela"}]
+    {"Name":"Tenorio", "Link":"https://www.imn.ac.cr/especial/tablas/tenorio.html", "Lat":10.7156, "Long": -84.98691, "Description":"Parque Nacional Volcán Tenorio, Guatuso, Alajuela"},
+    {"Name":"Abopac", "Link":"https://www.imn.ac.cr/especial/tablas/abopac.html", "Lat":9.8947, "Long": -84.3844, "Description":"Abopac, Orotina, Alajuela"},
+    {"Name":"Daniel Oduber 07", "Link":"https://www.imn.ac.cr/especial/tablas/lib07.html", "Lat":10.5889, "Long": -85.5522, "Description":"Aeropuerto Daniel Oduber en Liberia - Pista 07"}]
 
 def lightnings_db_connection():
     server = '192.168.4.11'
@@ -62,9 +64,13 @@ def write_stations(stations):
                 logging.info(err)
     cnxn.close()
 
-def read_stations(): ## Only the active Ones
+def read_stations(all=False): ## Only the active Ones
     cnxn = lightnings_db_connection()
-    sql = f"""select * from IMN_WeatherStations where [Enabled] = 1 order by id"""
+    if all:
+        sql = f"""select [id], [Name], [Desc], [Lat], [Long]  from IMN_WeatherStations order by id"""
+    else:
+        sql = f"""select [id], [Name], [Desc], [Lat], [Long] from IMN_WeatherStations where [Enabled] = 1 order by id"""
+
     if cnxn is not None:
         try:
             stations_df = pd.read_sql_query(sql, cnxn)
@@ -121,8 +127,46 @@ def write_data_values(station, station_data):
                     except pyodbc.Error as err:
                         logging.info(err)
         cnxn.close()
-    
+
+##########################################
+
+def read_data_by_station(station_ID, initial_date, final_date):
+    cnxn = lightnings_db_connection()
+    if cnxn is not None:
+        sql = f'exec [IMN_GetDataByStation] \'{station_ID}\', \'{initial_date}\', \'{final_date}\''
+        try:
+            data_df = pd.read_sql_query(sql, cnxn)
+        except pyodbc.Error as err:
+            logging.info(err)
+        cnxn.close()
+        return data_df
+    return None
+
+def read_data_by_variable(var_ID, initial_date, final_date):
+    cnxn = lightnings_db_connection()
+    if cnxn is not None:
+        sql = f'exec [IMN_GetDataByVar] \'{var_ID}\', \'{initial_date}\', \'{final_date}\''
+        try:
+            data_df = pd.read_sql_query(sql, cnxn)
+        except pyodbc.Error as err:
+            logging.info(err)
+        cnxn.close()
+        return data_df
+    return None
+
+def read_last_updates():
+    cnxn = lightnings_db_connection()
+    if cnxn is not None:
+        sql = f'exec [IMN_LastDateUpdate]'
+        try:
+            data_df = pd.read_sql_query(sql, cnxn)
+        except pyodbc.Error as err:
+            logging.info(err)
+        cnxn.close()
+        return data_df
+    return None
+
 
 if __name__ == "__main__":
-#     write_stations(stations)
+    write_stations(loc_stations)
     print(read_stations())
