@@ -25,6 +25,8 @@ def bs_get_table(soup_data, station, table_number = 1):
                     string_data = str(col.contents[0])
                     if ',' in string_data:
                         row_data.append(string_data.replace(".", "").replace(",", "."))
+                    elif ".m." in string_data:
+                        row_data.append(string_data.replace(".", ""))
                     else:
                         row_data.append(string_data)
                 table_data.append(row_data)
