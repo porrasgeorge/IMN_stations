@@ -41,12 +41,18 @@ def monthly_report():
     base_path = f'\\\\192.168.30.30\\Planificacion\\Estaciones_IMN'
     Path(base_path).mkdir(parents=True, exist_ok=True)
     end_date = date.today()
-    initial_date = end_date - relativedelta(months=1)
+    initial_date = end_date - relativedelta(days=2)
     variables = db.read_variables()
     stations = db.read_stations()
+    
+    # variables = variables[variables["id"] == 6]
+    # stations = stations[stations["id"]==33]
+    # print(stations)
+    # print(variables)
+
     ordered_stations = list(stations["Name"])
     # Create a Pandas Excel writer using XlsxWriter as the engine.
-    # writer = pd.ExcelWriter(f'{base_path}\\IMN_{initial_date.strftime("%Y_%m_%d")}.xlsx', engine='xlsxwriter', datetime_format='dd/mm/yyyy hh:mm') # pylint: disable=abstract-class-instantiated
+    writer = pd.ExcelWriter(f'{base_path}\\IMN_{initial_date.strftime("%Y_%m_%d")}.xlsx', engine='xlsxwriter', datetime_format='dd/mm/yyyy hh:mm') # pylint: disable=abstract-class-instantiated
     # workbook  = writer.book
 
     for _, variable in variables.iterrows():
@@ -60,10 +66,10 @@ def monthly_report():
 
         print(data_spreaded)
         
-        # data_spreaded.to_excel(writer, sheet_name=variable["Name"], index=False) #, startrow=4)
-        # worksheet = writer.sheets[variable["Name"]]
-        # worksheet.set_column('A:A', 18)
+        data_spreaded.to_excel(writer, sheet_name=variable["Name"], index=False) #, startrow=4)
+        worksheet = writer.sheets[variable["Name"]]
+        worksheet.set_column('A:A', 18)
 
-    # writer.save()
+    writer.save()
 
 monthly_report()

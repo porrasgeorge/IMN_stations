@@ -8,6 +8,7 @@ import time
 def bs_get_table(soup_data, station, table_number = 1):
     All_tables = soup_data.findAll("table")
     table = All_tables[table_number - 1]
+    
     if table:
         table_data=list()
         for row in table.findAll("tr"):
@@ -21,8 +22,11 @@ def bs_get_table(soup_data, station, table_number = 1):
             col_data = row.findAll("td")
             if col_data:
                 for col in col_data:
-                    row_data.append(str(col.contents[0]).replace(".", "").replace(",", "."))
-
+                    string_data = str(col.contents[0])
+                    if ',' in string_data:
+                        row_data.append(string_data.replace(".", "").replace(",", "."))
+                    else:
+                        row_data.append(string_data)
                 table_data.append(row_data)
         
         if len(table_data):
@@ -53,7 +57,6 @@ def IMN_read_station_webpage(station, table_number = 1):
     #print("Station: ", station["Name"])
     response = None
     try:
-        print(station)
         response = requests.get(station["Link"], timeout=10)
     except (requests.ConnectionError, requests.Timeout):
         logging.info(f'{station["Name"]}: Connection Error or timeout')
