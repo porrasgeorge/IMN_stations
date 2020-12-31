@@ -34,52 +34,60 @@ def generate_day_report(report_date):
 
     writer.save()
 
-# def generate_monthly_rain_report():
-#     base_path = f'\\\\192.168.30.30\\Planificacion\\Estaciones_IMN'
-#     Path(base_path).mkdir(parents=True, exist_ok=True)
-#     end_date = date.today()
-#     initial_date = end_date - relativedelta(days=2)
-#     variables = db.read_variables()
-#     stations = db.read_stations()
+def generate_monthly_rain_report():
+    base_path = f'\\\\192.168.30.30\\Planificacion\\Estaciones_IMN'
+    Path(base_path).mkdir(parents=True, exist_ok=True)
+    end_date = date.today()
+    end_datetime = datetime(end_date.year, end_date.month, end_date.day)
+    initial_date = end_date - relativedelta(months=1)
+    initial_datetime = datetime(initial_date.year, initial_date.month, 1)
+    print("Fecha inicial: ", initial_datetime)
+    print("Fecha final: ", end_datetime)
     
-#     # variables = variables[variables["id"] == 6]
-#     # stations = stations[stations["id"]==33]
-#     # print(stations)
-#     # print(variables)
+    variables = db.read_variables()
+    stations = db.read_stations()
+    
+    variables = variables[variables["id"] == 3]
+    #stations = stations[stations["id"]==10]
+    # print(stations)
+    # print(variables)
 
-#     ordered_stations = list(stations["Name"])
-#     # Create a Pandas Excel writer using XlsxWriter as the engine.
-#     writer = pd.ExcelWriter(f'{base_path}\\IMN_{initial_date.strftime("%Y_%m_%d")}.xlsx', engine='xlsxwriter', datetime_format='dd/mm/yyyy hh:mm') # pylint: disable=abstract-class-instantiated
-#     # workbook  = writer.book
+    ordered_stations = list(stations["Name"])
+    # Create a Pandas Excel writer using XlsxWriter as the engine.
+    writer = pd.ExcelWriter(f'{base_path}\\IMN_{initial_date.strftime("%Y_%m")}_month.xlsx', engine='xlsxwriter', datetime_format='dd/mm/yyyy hh:mm') # pylint: disable=abstract-class-instantiated
+    # workbook  = writer.book
 
-#     for _, variable in variables.iterrows():
-#         data_df = db.read_data_by_variable(variable["id"], initial_date, end_date)
-#         data_spreaded = data_df.pivot(index="DateTime", columns="Station", values="Value")
-#         #data_spreaded = data_df.pivot(columns="Station", values="Value")
-#         station_in_df = sorted(set(ordered_stations) & set(data_df["Station"]), key = ordered_stations.index)
-#         data_spreaded = data_spreaded[station_in_df]
-#         data_spreaded["group_Date"] = data_spreaded.index - pd.Timedelta(minutes=1)
-#         data_spreaded["group_Date"] = pd.to_datetime(data_spreaded["group_Date"]).dt.to_period('D')
+    for _, variable in variables.iterrows():
+        data_df = db.read_data_by_variable(variable["id"], initial_date, end_date)
+        data_spreaded = data_df.pivot(index="DateTime", columns="Station", values="Value")
+        #data_spreaded = data_df.pivot(columns="Station", values="Value")
+        station_in_df = sorted(set(ordered_stations) & set(data_df["Station"]), key = ordered_stations.index)
+        #sort the columns in df
+        data_spreaded = data_spreaded[station_in_df]
+        #new column for grouping 
+        data_spreaded["group_Date"] = data_spreaded.index - pd.Timedelta(minutes=1)
+        #remove the time part
+        data_spreaded["group_Date"] = pd.to_datetime(data_spreaded["group_Date"]).dt.to_period('D')
+        data_grouped = data_spreaded.groupby(["group_Date"]).sum()
 
-#         print(data_spreaded)
+        # print(data_spreaded)
+        # print(data_grouped)
         
-#         data_spreaded.to_excel(writer, sheet_name=variable["Name"], index=False) #, startrow=4)
-#         worksheet = writer.sheets[variable["Name"]]
-#         worksheet.set_column('A:A', 18)
+        
+        data_grouped.to_excel(writer, sheet_name=variable["Name"], index=True) #, startrow=4)
+        worksheet = writer.sheets[variable["Name"]]
+        worksheet.set_column('A:A', 18)
 
-#     writer.save()
-
-# - timedelta(days=1)
-# generate_day_report(report_date)
+    writer.save()
 
 
-## fill all month reports
+# ## fill all month reports
 # report_date = date.today()
-# date_range = pd.DataFrame({'Date': pd.date_range(start=report_date-relativedelta(months=2), end=report_date-relativedelta(days=1), freq="D")})
+# date_range = pd.DataFrame({'Date': pd.date_range(start=report_date-relativedelta(days=3), end=report_date-relativedelta(days=1), freq="D")})
 # for _, actual_date in date_range.iterrows():
 #     print(actual_date["Date"])
 #     generate_day_report(actual_date["Date"])
 
 
 # report_date = date.today() - timedelta(days=20)
-# generate_day_report(report_date)
+generate_monthly_rain_report()
