@@ -39,7 +39,10 @@ def generate_monthly_rain_report():
     Path(base_path).mkdir(parents=True, exist_ok=True)
     end_date = date.today()
     end_datetime = datetime(end_date.year, end_date.month, end_date.day)
-    initial_date = end_date - relativedelta(months=1)
+    if end_date.day == 1:
+        initial_date = end_date - relativedelta(months=1)
+    else:
+        initial_date = end_date
     initial_datetime = datetime(initial_date.year, initial_date.month, 1)
     print("Fecha inicial: ", initial_datetime)
     print("Fecha final: ", end_datetime)
@@ -47,10 +50,9 @@ def generate_monthly_rain_report():
     variables = db.read_variables()
     stations = db.read_stations()
     
+    #only rain variable
     variables = variables[variables["id"] == 3]
-    #stations = stations[stations["id"]==10]
-    # print(stations)
-    # print(variables)
+
 
     ordered_stations = list(stations["Name"])
     # Create a Pandas Excel writer using XlsxWriter as the engine.
@@ -58,11 +60,12 @@ def generate_monthly_rain_report():
     # workbook  = writer.book
 
     for _, variable in variables.iterrows():
-        data_df = db.read_data_by_variable(variable["id"], initial_date, end_date)
+        data_df = db.read_data_by_variable(variable["id"], initial_datetime, end_datetime)
+        print(data_df)
         data_spreaded = data_df.pivot(index="DateTime", columns="Station", values="Value")
         #data_spreaded = data_df.pivot(columns="Station", values="Value")
         station_in_df = sorted(set(ordered_stations) & set(data_df["Station"]), key = ordered_stations.index)
-        #sort the columns in df
+        #sort the columns in df by ID
         data_spreaded = data_spreaded[station_in_df]
         #new column for grouping 
         data_spreaded["group_Date"] = data_spreaded.index - pd.Timedelta(minutes=1)
@@ -81,13 +84,12 @@ def generate_monthly_rain_report():
     writer.save()
 
 
-# ## fill all month reports
-# report_date = date.today()
-# date_range = pd.DataFrame({'Date': pd.date_range(start=report_date-relativedelta(days=3), end=report_date-relativedelta(days=1), freq="D")})
-# for _, actual_date in date_range.iterrows():
-#     print(actual_date["Date"])
-#     generate_day_report(actual_date["Date"])
+# create and update last 3 days reports
+report_date = date.today()
+date_range = pd.DataFrame({'Date': pd.date_range(start=report_date-relativedelta(days=3), end=report_date-relativedelta(days=1), freq="D")})
+for _, actual_date in date_range.iterrows():
+    print(actual_date["Date"])
+    generate_day_report(actual_date["Date"])
 
-
-# report_date = date.today() - timedelta(days=20)
+#genrate the montly resumed rain report
 generate_monthly_rain_report()
