@@ -4,6 +4,7 @@ import IMN_DB as db
 stations = db.read_stations() ## All stations to scrap data
 if stations is not None:
     for i, station in stations.iterrows():
+        print(station["Name"])
         if station["Name"] == "Rio Zapote":
             station_data = ws.IMN_read_station_webpage(station)    ## station data
             if station_data is not None:

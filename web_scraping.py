@@ -4,6 +4,23 @@ import pandas as pd
 import IMN_DB as db
 import logging
 import time
+import re
+import datetime as dt
+
+
+
+def try_parsing_date(text):
+    DATE_FORMATS = ["%d/%m/%Y %H:%M %p", "%d/%m/%Y %#H:%M %p", "%d/%m/%Y %#H:%M:%S %p", "%d/%m/%Y %I:%M:%S %p", "%#d/%m/%Y %#H:%M:%S %p"]
+    print("fecha:", text)
+    for fmt in DATE_FORMATS:
+        try:
+            print("trying:", fmt)
+            _ = dt.datetime.strptime(text, fmt)
+            return fmt
+        except ValueError:
+            pass
+    logging.info(f'Error parsing dates "{text}"')
+    raise ValueError('no valid date format found')
 
 def bs_get_table(soup_data, station, table_number = 1):
     All_tables = soup_data.findAll("table")
@@ -40,15 +57,21 @@ def bs_get_table(soup_data, station, table_number = 1):
                     table_data[0] = [d.replace("P. Atm", "P Atm") for d in table_data[0]]
                     table_data[0] = [d.replace("P Atm_Avg", "P Atm") for d in table_data[0]]
                     table_data[0] = [d.replace("Nivel_Rio_Zapote", "Nivel") for d in table_data[0]]    
+                    
+                    for table_d in table_data:
+                        # table_d[0] = table_d[0].replace(u'\xa0', " ")
+                        # table_d[0] = table_d[0].replace("a. m.", "AM")
+                        # table_d[0] = table_d[0].replace("p. m.", "PM")
+                        table_d[0] = re.sub(r"([ap]).[\s\S]{1,2}([m]).", r"\1\2", table_d[0])
+
                     data_df = pd.DataFrame(table_data[1:], columns=table_data[0])
                     try:
-                        data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format="%d/%m/%Y %I:%M %p")
+                        date_format =try_parsing_date(data_df["Fecha"][0])
+                        print("formato:", date_format)
+                        data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format=date_format)
                     except ValueError:
-                        try:
-                            data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format="%d/%m/%Y %H:%M:%S")
-                        except ValueError:
-                            logging.info(f'{station["Name"]}: Error parsing dates')
-                            return None
+                        logging.info(f'{station["Name"]}: Error parsing dates')
+                        return None
                     cols = data_df.columns
                     data_df[cols[1:]] = data_df[cols[1:]].apply(pd.to_numeric, errors='coerce')
                     return data_df
@@ -56,7 +79,7 @@ def bs_get_table(soup_data, station, table_number = 1):
 
 
 def IMN_read_station_webpage(station, table_number = 1):
-    #print("Station: ", station["Name"])
+    print("Station: ", station["Name"])
     response = None
     try:
         response = requests.get(station["Link"], timeout=10)

@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from pathlib import Path
 
 def generate_day_report(report_date):
-    base_path = f'\\\\192.168.30.30\\Planificacion\\Estaciones_IMN'
+    base_path = f'\\\\192.168.15.15\\Planificacion\\Estaciones_IMN'
     Path(base_path).mkdir(parents=True, exist_ok=True)
     initial_datetime = datetime(report_date.year, report_date.month, report_date.day)
     end_datetime = initial_datetime + timedelta(days=1)
@@ -35,7 +35,7 @@ def generate_day_report(report_date):
     writer.save()
 
 def generate_monthly_rain_report():
-    base_path = f'\\\\192.168.30.30\\Planificacion\\Estaciones_IMN'
+    base_path = f'\\\\192.168.15.15\\Planificacion\\Estaciones_IMN'
     Path(base_path).mkdir(parents=True, exist_ok=True)
     end_date = date.today()
     end_datetime = datetime(end_date.year, end_date.month, end_date.day)

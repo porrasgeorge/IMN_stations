@@ -235,11 +235,14 @@ def write_data_values(station, station_data):
         sql = "{CALL InsertDataMeasure (?, ?, ?, ?)}"
         for _, row in station_data.iterrows():
             for i in cols:
-                if not np.isnan(row[i]) :
+                if np.isfinite(row[i]):
                     values = (station_name, i, row["Fecha"], row[i])
                     try:
                         cursor.execute(sql, values)
                     except pyodbc.Error as err:
+                        print("sql", sql)
+                        
+                        print("values",values)
                         logging.info(err)
         cnxn.close()
 
