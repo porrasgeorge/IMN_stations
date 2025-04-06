@@ -2,10 +2,10 @@ import pyodbc
 import pandas as pd
 import numpy as np
 from os import makedirs, path
-from datetime import datetime
+import datetime as dt
 import logging
 
-log_filename = f'logs\\weather_datalog_{datetime.now().strftime("%Y_%m")}.log'
+log_filename = f'logs\\weather_datalog_{dt.datetime.now().strftime("%Y_%m")}.log'
 makedirs(path.dirname(log_filename), exist_ok=True)
 logging.basicConfig(level=logging.INFO, filename=log_filename,
                     format='%(asctime)s Ln: %(lineno)d - %(message)s')
@@ -31,7 +31,7 @@ loc_stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tab
     {"Name":"Pozo Azul", "Link":"https://www.imn.ac.cr/especial/tablas/pozoazul.html", "Lat":10.3858, "Long": -84.1396, "Description":"Hotel Pozo Azul, Sarapiquí, Heredia"},
     {"Name":"La Rebusca", "Link":"https://www.imn.ac.cr/especial/tablas/larebusca.html", "Lat":10.4245, "Long": -84.0091, "Description":"Finca la Rebusca, Puerto Viejo, Heredia"},
     {"Name":"Los Chiles", "Link":"https://www.imn.ac.cr/especial/tablas/loschiles.html", "Lat":11.0316, "Long": -84.7115, "Description":"Comando Los Chiles de Alajuela"},
-    {"Name":"Cano Negro", "Link":"https://www.imn.ac.cr/especial/tablas/canonegro.html", "Lat":10.8918, "Long": -84.7877, "Description":"Refugio Caño Negro, Los Chiles - Alajuela"},
+    #{"Name":"Cano Negro", "Link":"https://www.imn.ac.cr/especial/tablas/canonegro.html", "Lat":10.8918, "Long": -84.7877, "Description":"Refugio Caño Negro, Los Chiles - Alajuela"},
     {"Name":"San Jorge", "Link":"https://www.imn.ac.cr/especial/tablas/sanjorge.html", "Lat":10.7237, "Long": -84.6751, "Description":"Saint George (San Jorge), Los Chiles, Alajuela"},
     {"Name":"San Gerardo", "Link":"https://www.imn.ac.cr/especial/tablas/sangerardo.html", "Lat":10.4159, "Long": -84.1581, "Description":"San Gerardo, La Virgen de Sarapiquí, Heredia"},
     {"Name":"Tenorio", "Link":"https://www.imn.ac.cr/especial/tablas/tenorio.html", "Lat":10.7156, "Long": -84.98691, "Description":"Parque Nacional Volcán Tenorio, Guatuso, Alajuela"},
@@ -137,7 +137,7 @@ loc_stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tab
     {"Name":"Santa Lucia", "Link":"https://www.imn.ac.cr/especial/tablas/stalucia.html", "Lat":10.0230, "Long":-84.11175, "Description":"Santa Lucía, UNA Heredia"},
     {"Name":"Santa Rita", "Link":"https://www.imn.ac.cr/especial/tablas/nandayure.html", "Lat":10.0189, "Long":-85.2619, "Description":"Santa Rita de Nandayure Guanacaste"},
     {"Name":"Santa Rosa", "Link":"https://www.imn.ac.cr/especial/tablas/santarosa.html", "Lat":10.8411, "Long":-85.6194, "Description":"Santa Rosa Guanacaste"},
-    {"Name":"Sartalillo Potrero Cerrado", "Link":"https://www.imn.ac.cr/especial/tablas/potrero.html", "Lat":9.9022, "Long":-83.8858, "Description":"Potrero Cerrado, Sartalillo de Cartago"},
+    #{"Name":"Sartalillo Potrero Cerrado", "Link":"https://www.imn.ac.cr/especial/tablas/potrero.html", "Lat":9.9022, "Long":-83.8858, "Description":"Potrero Cerrado, Sartalillo de Cartago"},
     {"Name":"Sitio La Cruz", "Link":"https://www.imn.ac.cr/especial/tablas/sitiolacruz.html", "Lat":10.4831, "Long":-85.4142, "Description":"Sitio La Cruz, Bagaces, Guanacaste"},
     {"Name":"Sitio Mata", "Link":"https://www.imn.ac.cr/especial/tablas/sitiomata.html", "Lat":9.8792, "Long":83.6258, "Description":"Sitio Matas, Turrialba, Cartago"},
     {"Name":"Sixaola", "Link":"https://www.imn.ac.cr/especial/tablas/sixaola.html", "Lat":9.5275, "Long":-82.6336, "Description":"Sixaola, Talamanca, Limón"},
@@ -148,10 +148,10 @@ loc_stations = [{"Name":"Rio Zapote", "Link":"https://www.imn.ac.cr/especial/tab
     {"Name":"UTN, Balsa de Atenas", "Link":"https://www.imn.ac.cr/especial/tablas/utn.html", "Lat":9.9356, "Long":-84.3798, "Description":"UTN, Atenas, Alajuela"},
     {"Name":"Volcan Irazu", "Link":"https://www.imn.ac.cr/especial/tablas/virazu.html", "Lat":9.9800, "Long":-83.8378, "Description":"Volcán Irazú, Alvarado, Cartago"},
     {"Name":"Volcan Turrialba", "Link":"https://www.imn.ac.cr/especial/tablas/vturri.html", "Lat":10.0192, "Long":-83.7564, "Description":"Volcán Turrialba, Turrialba de Cartago"},
-    {"Name":"Zapote", "Link":"https://www.imn.ac.cr/especial/tablas/zapote.html", "Lat":9.9256, "Long":-84.0589, "Description":"Radio Columbia, Zapote, San José"}]
+    #{"Name":"Zapote", "Link":"https://www.imn.ac.cr/especial/tablas/zapote.html", "Lat":9.9256, "Long":-84.0589, "Description":"Radio Columbia, Zapote, San José"}
+    ]
 
-# ,
-#     {"Name":"", "Link":"https://www.imn.ac.cr/especial/tablas/", "Lat":, "Long":, "Description":""}
+# loc_stations = [ {"Name":"ASADA San Gabriel", "Link":"https://www.imn.ac.cr/especial/tablas/sgabriel.html", "Lat":9.7872, "Long":-84.1053, "Description":"Asada San Gabriel, Desamparados, San José"},]
 
 def lightnings_db_connection():
     server = '192.168.4.11'

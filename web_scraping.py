@@ -4,78 +4,52 @@ import pandas as pd
 import IMN_DB as db
 import logging
 import time
-import re
 import datetime as dt
 
+from io import StringIO
+import string
 
-
-def try_parsing_date(text):
-    DATE_FORMATS = ["%d/%m/%Y %H:%M %p", "%d/%m/%Y %#H:%M %p", "%d/%m/%Y %#H:%M:%S %p", "%d/%m/%Y %I:%M:%S %p", "%#d/%m/%Y %#H:%M:%S %p"]
-    print("fecha:", text)
-    for fmt in DATE_FORMATS:
-        try:
-            print("trying:", fmt)
-            _ = dt.datetime.strptime(text, fmt)
-            return fmt
-        except ValueError:
-            pass
-    logging.info(f'Error parsing dates "{text}"')
-    raise ValueError('no valid date format found')
 
 def bs_get_table(soup_data, station, table_number = 1):
-    All_tables = soup_data.findAll("table")
-    table = All_tables[table_number - 1]
-    
-    if table:
-        table_data=list()
-        for row in table.findAll("tr"):
-            row_data=list()
-            col_titles = row.findAll("th")
-            if col_titles:
-                for col in col_titles:
-                    row_data.append(col.contents[0])
-                table_data.append(row_data)
-                
-            col_data = row.findAll("td")
-            if col_data:
-                for col in col_data:
-                    string_data = str(col.contents[0])
-                    if ',' in string_data:
-                        row_data.append(string_data.replace(".", "").replace(",", "."))
-                    elif ".m." in string_data:
-                        row_data.append(string_data.replace(".", ""))
-                    else:
-                        row_data.append(string_data)
-                table_data.append(row_data)
-        
-        if len(table_data):
-            if len(table_data[0]):
-                if table_data[0][0] == "Fecha":
-                    table_data[0] = [d.replace("PRES_mb", "P Atm") for d in table_data[0]]
-                    table_data[0] = [d.replace("Rad_PAR", "Rad PAR") for d in table_data[0]]
-                    table_data[0] = [d.replace("P.Atm", "P Atm") for d in table_data[0]]
-                    table_data[0] = [d.replace("P. Atm", "P Atm") for d in table_data[0]]
-                    table_data[0] = [d.replace("P Atm_Avg", "P Atm") for d in table_data[0]]
-                    table_data[0] = [d.replace("Nivel_Rio_Zapote", "Nivel") for d in table_data[0]]    
-                    
-                    for table_d in table_data:
-                        # table_d[0] = table_d[0].replace(u'\xa0', " ")
-                        # table_d[0] = table_d[0].replace("a. m.", "AM")
-                        # table_d[0] = table_d[0].replace("p. m.", "PM")
-                        table_d[0] = re.sub(r"([ap]).[\s\S]{1,2}([m]).", r"\1\2", table_d[0])
+    all_tables = soup_data.findAll("table")
+    last_table_str = str(all_tables[table_number - 1])
+    last_table_str = ''.join(char for char in last_table_str if char in string.printable) ## or char == '\n')
+    last_table_str = last_table_str.replace("NAN", "0.0")
+    table_pd_list:list[pd.DataFrame] = pd.read_html(StringIO(last_table_str), header=0, decimal=",", thousands=".", )
+    table_df:pd.DataFrame= None
+    if isinstance(table_pd_list, list):
+        table_df = table_pd_list[0]
+        columns = list(table_df.columns)
+        for idx, col in enumerate(columns):
+            if col == 'Nivel_Rio_Zapote':
+                columns[idx] = "Nivel"
+                break
+            if col == 'PRES_mb':
+                columns[idx] = "P Atm"
+                break
+            if col == 'Pres_mb':
+                columns[idx] = "P Atm"
+                break
+            if col == 'Rad_PAR':
+                columns[idx] = "Rad PAR"
+                break   
+            if col == 'P.Atm':  
+                columns[idx] = "P Atm"
+                break
+            if col == 'P Atm_Avg':
+                columns[idx] = "P Atm"
+                break
+            if col == 'P. Atm':
+                columns[idx] = "P Atm"
+                break
+            if idx> 0:
+                columns[idx] = col.replace(" ", "_")
+        table_df.columns = columns
+        table_df.iloc[:,0] = table_df.iloc[:,0].str.replace(r"([ap]).[\s\S]{0,2}([m]).", r"\1\2", regex=True)
+        table_df['Fecha'] = pd.to_datetime(table_df['Fecha'], format='%d/%m/%Y %I:%M %p', errors='ignore')
+        table_df['Fecha'] = pd.to_datetime(table_df['Fecha'], format='%d/%m/%Y %H:%M:%S', errors='ignore')
+        return table_df
 
-                    data_df = pd.DataFrame(table_data[1:], columns=table_data[0])
-                    try:
-                        date_format =try_parsing_date(data_df["Fecha"][0])
-                        print("formato:", date_format)
-                        data_df["Fecha"] = pd.to_datetime(data_df["Fecha"], format=date_format)
-                    except ValueError:
-                        logging.info(f'{station["Name"]}: Error parsing dates')
-                        return None
-                    cols = data_df.columns
-                    data_df[cols[1:]] = data_df[cols[1:]].apply(pd.to_numeric, errors='coerce')
-                    return data_df
-    return None
 
 
 def IMN_read_station_webpage(station, table_number = 1):
@@ -88,8 +62,10 @@ def IMN_read_station_webpage(station, table_number = 1):
     
     if response:
         if response.status_code == 200:
+            response.encoding = 'utf-8'
             soup_data = BeautifulSoup(response.text, 'html.parser')
-            return bs_get_table(soup_data, station, table_number)
+            table = bs_get_table(soup_data, station, table_number)
+            return table
             
         else:
             logging.info(f'{station["Name"]}: Error cargando la pagina web')
@@ -98,6 +74,4 @@ def IMN_read_station_webpage(station, table_number = 1):
     logging.info(f'{station["Name"]}: Error, No hay respuesta de la pagina web')
     time.sleep(10)      ## wait to check for the next page
     return None
-
-
 
